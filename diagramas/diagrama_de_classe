@@ -1,0 +1,98 @@
+classDiagram
+    %% Usuários (Factory Method)
+    class User {
+        +name: str
+        +points: int
+        +achievements: list
+        +add_points(points)
+        +add_achievement(achievement)
+    }
+    class Aluno
+    class Professor
+    class Visitante
+    User <|-- Aluno
+    User <|-- Professor
+    User <|-- Visitante
+
+    class UserFactory {
+        +create_user(type, name)
+    }
+
+    %% Sessão (Singleton)
+    class Session {
+        +users: list
+        +actions: list
+        +get_instance()
+        +add_user(user)
+        +log_action(action)
+    }
+
+    %% Desafios (Strategy)
+    class Challenge {
+        +title: str
+        +description: str
+        +strategy: ScoringStrategy
+        +evaluate(submission, context)
+    }
+
+    class QuizChallenge
+    class ScoringStrategy {
+        <<interface>>
+        +calculate_score(submission, context)
+    }
+    class TimeBasedScoring
+    class DifficultyBasedScoring
+    class AccuracyBasedScoring
+
+    Challenge <|-- QuizChallenge
+    Challenge o-- ScoringStrategy
+    ScoringStrategy <|-- TimeBasedScoring
+    ScoringStrategy <|-- DifficultyBasedScoring
+    ScoringStrategy <|-- AccuracyBasedScoring
+
+    %% Gamificação (Composite + Observer + Decorator)
+    class Achievement {
+        +name: str
+        +points_required: int
+        +is_unlocked(user)
+    }
+    class Medal
+    class MedalCollection {
+        +children: list
+        +add(achievement)
+        +is_unlocked(user)
+    }
+    class AchievementCenter {
+        +subscribers: list
+        +check_achievements(user)
+    }
+    class AchievementObserver {
+        +update(user, achievement)
+    }
+    class AchievementComponent {
+        +get_points()
+    }
+    class BaseAchievement
+    class AchievementDecorator
+    class StreakBonus
+    class DoubleXP
+
+    Achievement <|-- Medal
+    Achievement <|-- MedalCollection
+    AchievementCenter o-- AchievementObserver
+    AchievementComponent <|-- BaseAchievement
+    AchievementComponent <|-- AchievementDecorator
+    AchievementDecorator <|-- StreakBonus
+    AchievementDecorator <|-- DoubleXP
+
+    %% Relatórios (Facade + Adapter)
+    class ReportFacade {
+        +export_all(data)
+        +export_json(data)
+        +export_csv(data)
+        +export_pdf(data)
+    }
+    class ExternalRankingAdapter {
+        +send(data)
+    }
+    ReportFacade o-- ExternalRankingAdapter

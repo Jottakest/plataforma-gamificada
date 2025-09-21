@@ -1,0 +1,1 @@
+Para utilizar o código que gerou os diagramas basta usar ferramentas que consigam renderizar o Mermaid

@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Aluno
+    participant Challenge
+    participant ScoringStrategy
+    participant Session
+    participant AchievementCenter
+    participant Observer
+
+    Aluno->>Challenge: envia submissão
+    Challenge->>ScoringStrategy: calcular pontos
+    ScoringStrategy-->>Challenge: retorna pontos
+    Challenge->>Aluno: adiciona pontos
+    Session->>Session: log_action("Aluno respondeu desafio")
+    Challenge->>AchievementCenter: check_achievements(Aluno)
+    AchievementCenter->>Observer: update(Aluno, Achievement)
+    Observer-->>Aluno: notificação de conquista
