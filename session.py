@@ -1,45 +1,59 @@
-"""
-Singleton de sessão que centraliza usuários, logs e sessão global.
-"""
 from threading import Lock
+from typing import Any
 
 
 class Session:
+    """
+    Singleton de sessão que centraliza usuários ativos e logs de ações.
+    Thread-safe para garantir consistência em ambientes concorrentes.
+    """
+
     _instance = None
     _lock = Lock()
 
     def __init__(self):
         if Session._instance is not None:
-            raise Exception("Use get_instance() para acessar a instância única.")
-        self.users = []
-        self.actions = []
+            raise RuntimeError("Use Session.get_instance() para acessar a instância única.")
+        self._users: list[str] = []
+        self._actions: list[Any] = []
+        self._data_lock = Lock()
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls) -> "Session":
         with cls._lock:
             if cls._instance is None:
-                cls._instance = Session()
+                cls._instance = cls()
             return cls._instance
 
-    def add_user(self, user):
-        """Adiciona um usuário ativo na sessão"""
-        self.users.append(user)
+    def add_user(self, user: str) -> None:
+        """Adiciona um usuário ativo na sessão (thread-safe)."""
+        with self._data_lock:
+            if user not in self._users:
+                self._users.append(user)
 
-    def log_action(self, action):
-        """Registra uma ação realizada na sessão"""
-        self.actions.append(action)
+    def remove_user(self, user: str) -> None:
+        """Remove um usuário da sessão (thread-safe)."""
+        with self._data_lock:
+            if user in self._users:
+                self._users.remove(user)
 
-    def get_users(self):
-        """Retorna todos os usuários ativos"""
-        return self.users
+    def log_action(self, action: Any) -> None:
+        """Registra uma ação realizada na sessão (thread-safe)."""
+        with self._data_lock:
+            self._actions.append(action)
 
-    def get_actions(self):
-        """Retorna o histórico de ações"""
-        return self.actions
+    def get_users(self) -> tuple[str, ...]:
+        """Retorna os usuários ativos (imutável)."""
+        with self._data_lock:
+            return tuple(self._users)
+
+    def get_actions(self) -> tuple[Any, ...]:
+        """Retorna o histórico de ações (imutável)."""
+        with self._data_lock:
+            return tuple(self._actions)
 
 
-# alias conveniente
-Session = Session
 class SessionManager:
-    def __new__(cls):
+    """Atalho para acessar a instância da sessão global."""
+    def __new__(cls) -> Session:
         return Session.get_instance()

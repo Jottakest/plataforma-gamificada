@@ -1,6 +1,6 @@
 # Plataforma Gamificada de Aprendizagem
 
-**Autores:** José Victor e João Gabriel  
+**Autores:** José Victor, João Gabriel e João Herik. 
 **Curso:** Análise e Desenvolvimento de Sistemas  
 
 ---
